@@ -138,7 +138,7 @@ example (P Q : Prop) (p : P) (_ : Q) : P := by
 
 
 /-
-## Exercise Block 1
+## Exercise Block B01
 -/
 
 -- Exercise 1.1
@@ -262,7 +262,7 @@ example (P : Prop) : P → P := fun p => p
 example : (fun (α : Type) => α) = id := rfl
 
 /-
-## Exercise Block 2
+## Exercise Block B02
 -/
 
 -- Exercise 2.1
@@ -482,7 +482,7 @@ example (P Q : Prop) (h : Q ↔ P) (pqr : P ∧ Q ∧ P) : P ∧ Q ∧ Q := by
   assumption
 
 /-
-## Exercise Block 3
+## Exercise Block B03
 -/
 
 -- Exercise 3.1

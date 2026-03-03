@@ -27,6 +27,7 @@ PARTS = [
 
 TITLE_RE = re.compile(r"^# (.+)$", re.MULTILINE)
 BLOCK_RE = re.compile(r"^## .*[Ee]xercise.*$", re.MULTILINE)
+BLOCK_LABEL_RE = re.compile(r"B(\d+)")
 EXERCISE_RE = re.compile(r"^-- Exercise (.+)$", re.MULTILINE)
 
 
@@ -179,8 +180,13 @@ def generate() -> str:
             link = f"[`{sec.name}`]({github_url(sec.rel_path)})"
             if has_exercises:
                 if sec.blocks:
+                    def block_label(b: ExerciseBlock, i: int) -> str:
+                        if m := BLOCK_LABEL_RE.search(b.heading):
+                            return f"B{int(m.group(1)):02d}"
+                        return f"B{i + 1:02d}"
+
                     block_links = " \\| ".join(
-                        f"[`B{i + 1:02d}`]({github_url(sec.rel_path, b.line)})"
+                        f"[`{block_label(b, i)}`]({github_url(sec.rel_path, b.line)})"
                         for i, b in enumerate(sec.blocks)
                     )
                 else:
