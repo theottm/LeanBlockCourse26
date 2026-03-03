@@ -489,17 +489,57 @@ example (P Q : Prop) (h : Q ↔ P) (pqr : P ∧ Q ∧ P) : P ∧ Q ∧ Q := by
 -- Shows how to use `rw` to prove that if `P` and `Q` are equivalent, and `Q` and
 -- `R` are equivalent, then `P` and `R` are equivalent (transitivity of `↔`)
 example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
-  sorry
+  rw [h₁] -- rewrite the goal
+  assumption -- assumption `h₂` is the goal
+
+example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
+  rw [← h₁] at h₂ -- rewrite the assumption `h₂`
+  assumption -- assumption `h₂` is the goal
+
+example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
+  rw [h₂.symm]
+  exact h₁ 
+
+example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
+  rw [h₁, h₂] -- you can tab through the contents of the square brackets to see the rewrites!
+
+-- ... many more equivalent variants
 
 -- Exercise 3.2
 -- Shows how to use `rw` to prove that if `Q` and `P` are equivalent, then
 -- `P` implies `Q` (modus tollens of `↔`)
 example (P Q : Prop) (h : Q ↔ P) : P → Q := by
-  sorry
+  rw [h] -- now we have to show `P → P`
+  intro p
+  exact p
+
+example (P Q : Prop) (h : Q ↔ P) : P → Q := by
+  rw [← h] -- now we have to show `Q → Q`
+  exact id
+
+example (P Q : Prop) (h : Q ↔ P) : P → Q := by
+  exact h.mpr -- but this is cheating since we wanted to use `rw`!
 
 -- Exercise 3.3
 -- Given four equivalent propositions in a cycle, prove that the first
 -- implies the last. You will need reverse rewriting (`← h`) or `symm`,
 -- and rewriting at hypotheses (`rw [...] at`).
 example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p : P) : S := by
-  sorry
+  rw [h₁, ← h₂, h₃] at p  -- produces `p : S` since variables are not renamed with `rw`
+  assumption              -- or `exact p`
+
+example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p : P) : S := by
+  rw [h₃.symm, h₂, h₁.symm]
+  exact p
+
+example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p : P) : S := by
+  revert p
+  rw [h₁, ← h₂]
+  exact h₃.mp
+
+example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p : P) : S := by
+  exact h₃.mp <| h₂.mpr <| h₁.mp p
+
+example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p : P) : S :=
+  h₃.mp <| h₂.mpr <| h₁.mp p
+
