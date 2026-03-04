@@ -149,19 +149,17 @@ example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
   rw [h₁.symm] at h₂
   exact h₂
 
-theorem rewriting (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
+theorem test_rewriting (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
   rw [h₁.symm] at h₂
   exact h₂
 
-#print rewriting
+#print test_rewriting
 
 example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R :=
   Eq.mp (congrArg (fun _a ↦ _a ↔ R) (propext (Iff.symm h₁))) h₂
 
 example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R :=
   (congrArg (fun _a ↦ _a ↔ R) (propext h₁.symm)).mp h₂
-
-example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := rewriting P Q R h₁ h₂
 
 -- This does not work
 -- example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := h₁ ▸ h₂
