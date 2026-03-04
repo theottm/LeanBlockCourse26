@@ -49,14 +49,31 @@ Use `rw [h] at h'` to rewrite in a specific hypothesis. Use `nth_rw n [h]` to re
 
 When the goal matches a hypothesis exactly, `exact h` or `assumption` closes it.
 
+## Tactic mode and term mode
+
+Tactic mode (after `by`) builds proofs step by step. Term mode constructs proofs directly as expressions. You can mix both freely.
+
+| Direction | Syntax | Example |
+|---|---|---|
+| Enter tactic mode | `by` | `theorem ... := by intro p; exact p` |
+| Use a term in tactic mode | `exact` | `exact ⟨p, q⟩` |
+| Use tactics inside a term | `by` in subexpression | `⟨p, by assumption⟩` |
+| Term mode function | `fun x => ...` | `fun p => ⟨p, p⟩` |
+| Anonymous constructor | `⟨...⟩` | `⟨h.2, h.1⟩` for `Q ∧ P` |
+| Field access | `.1`, `.2`, `.mp`, `.mpr` | `h.2` for second component |
+| Function application | `f x` or `f <| x` | `h₂ (h₁ p)` or `h₂ <| h₁ p` |
+| Composition | `g ∘ f` | `h₃ ∘ h₂ ∘ h₁` |
+
 ## Proof structure
 
 | Tactic | Effect |
 |---|---|
 | `have q := h p` | Forward step: derive a new fact from existing ones |
 | `suffices p : P by ...` | Backward step: state what would be enough, then prove it |
+| `calc a = b := ... _ = c := ...` | Chain equalities or inequalities through intermediate steps |
 | `by_contra h` | Assume `¬ goal` and derive `False` (classical) |
 | `by_cases h : P` | Split into `P` and `¬P` branches (classical) |
+| `rintro ⟨p, q⟩` / `rintro (p \| q)` | Combine `intro` with pattern matching |
 
 ## Automation
 
