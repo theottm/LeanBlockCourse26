@@ -158,24 +158,68 @@ it for every exercise, we define it once globally through `variable {α : Type}`
 variable {α : Type} (p q : α → Prop)
 
 -- Exercise 1.1
+
+-- We can grind through this ourselfs ...
 example : (∀ x : α, p x ∧ q x) ↔ ((∀ x : α, p x) ∧ (∀ x : α, q x)) := by
-  sorry
+  constructor
+  · intro h
+    constructor
+    · intro x
+      obtain ⟨px, qx⟩ := h x
+      exact px
+    · intro x
+      obtain ⟨px, qx⟩ := h x
+      exact qx
+  · intro ⟨h₁, h₂⟩
+    intro x
+    have px := h₁ x
+    have qx := h₂ x
+    exact ⟨px, qx⟩
+
+-- ... or have lean do it for us using the `grind` tactic ...
+example : (∀ x : α, p x ∧ q x) ↔ ((∀ x : α, p x) ∧ (∀ x : α, q x)) := by
+  grind
+
+-- ... though the term mode proof is also quite compact.
+example : (∀ x : α, p x ∧ q x) ↔ ((∀ x : α, p x) ∧ (∀ x : α, q x)) :=
+  ⟨fun h => ⟨fun x => (h x).1, fun x => (h x).2⟩, fun ⟨h₁, h₂⟩ x => ⟨h₁ x, h₂ x⟩⟩
 
 -- Exercise 1.2
 example : ((∀ x : α, p x) ∨ (∀ x : α, q x)) → (∀ x : α, p x ∨ q x) :=
-  sorry
+  intro h x
+  obtain (px | qx) := h
+  · left; exact px x
+  · right; exact qx x
 
 -- Exercise 1.3
 example : (∃ x, p x ∧ q x) → (∃ x, p x) ∧ (∃ x, q x) :=
-  sorry
+  intro ⟨x, px, qx⟩
+  constructor
+  all_goals use x
 
 -- Exercise 1.4
 -- Hint: use the `choose` tactic
 example (R : α → α → Prop) (h : ∀ x, ∃ y, R x y) : ∃ f : α → α, ∀ x, R x (f x) := by
-  sorry
+    ∃ f : X → X, ∀ x, R x (f x) := by
+  choose f hf using h
+  use f
 
 -- Exercise 1.5 (Master)
 -- Note that this introduces the cartesian product of two types `α × β`
 example {β} (Y : Type) (r : β → Prop)
-  (h₁ : ∃ x, p x) (h₂ : ∃ y, r y) : ∃ z : α × β, p z.1 ∧ r z.2 := by
-  sorry
+    (h₁ : ∃ x, p x) (h₂ : ∃ y, r y) : ∃ z : α × β, p z.1 ∧ r z.2 := by
+  obtain ⟨x, px⟩ := h₁
+  obtain ⟨y, qy⟩ := h₂
+  use ⟨x, y⟩
+
+-- Exercise 1.6 (Master)
+example (α : Type) (p q : α → Prop) : (∃ x : α, p x ∨ q x) ↔ ((∃ x : α, p x) ∨ (∃ x : α, q x)) := b
+  constructor
+  · intro h
+    obtain ⟨x, (px | qx)⟩ := h
+    · left; use x
+    · right; use x
+  · intro h
+    obtain (⟨x, px⟩ | ⟨x, qx⟩) := h
+    · use x; left; exact px
+    · use x; right; exact qxy
