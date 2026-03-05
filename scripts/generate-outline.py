@@ -220,7 +220,7 @@ ANNOUNCE_DATE_RE = re.compile(r"^\s*-\s+\*\*(\d{4}-\d{2}-\d{2}):\*\*")
 BEGIN_MARKER = "<!-- begin announcements -->"
 END_MARKER = "<!-- end announcements -->"
 
-RECENT_DAYS = 3
+RECENT_HOURS = 30
 BERLIN = ZoneInfo("Europe/Berlin")
 
 
@@ -349,7 +349,7 @@ def render_announcement(ann: Announcement) -> str:
 def inject_announcements() -> None:
     """Extract ## Announcements from README.md and inject into HOME.md.
 
-    Recent announcements (within RECENT_DAYS) are shown in highlighted
+    Recent announcements (within RECENT_HOURS) are shown in highlighted
     callouts at the top. Older ones are collapsed in a <details> block.
     Timestamps are inferred from git blame.
     """
@@ -357,9 +357,15 @@ def inject_announcements() -> None:
     if not announcements:
         return
 
-    cutoff = date.today() - timedelta(days=RECENT_DAYS)
-    recent = [a for a in announcements if a.d >= cutoff]
-    older = [a for a in announcements if a.d < cutoff]
+    cutoff = datetime.now(tz=BERLIN) - timedelta(hours=RECENT_HOURS)
+
+    def is_recent(a: Announcement) -> bool:
+        if a.timestamp is not None:
+            return a.timestamp >= cutoff
+        return a.d >= cutoff.date()
+
+    recent = [a for a in announcements if is_recent(a)]
+    older = [a for a in announcements if not is_recent(a)]
 
     style = (
         '<style>'
