@@ -22,12 +22,10 @@ This module introduces the most basic building blocks for constructing proofs in
 
 Note: Tactic usage counts in this course are approximate, measured against
 Mathlib in February 2025.
-
-
 ## Proofs by reflexivity - the `rfl` tactic
 
 The `rfl` tactic proves goals that are true by definition
-and is (explicitly) used around 4000 times in mathlib and many
+and is (explicitly) used around 4,000 times in mathlib and many
 times more implicitly through `rw`, `exact`, `simp`, ...
 -/
 
@@ -54,13 +52,15 @@ example (P : Prop) : P ↔ P := by
 -- does *not* work in term mode!
 -- example (P : Prop) : P ↔ P := rfl
 
--- Works with definitional equality: proves that 2 + 2 is 4 *by definition*
--- Why is this true? Because 4 = 0.succ.succ.succ.succ, 2 = 0.succ.succ
--- and a + b.succ = (a + b).succ, so unraveling everything, both sides reduce to
--- 0.succ.succ.succ.succ, which is four!
---
--- BUT: this only works because we are cleverly modelling Nat through DTT
--- as an inductive type, not explicitly through Peano axioms! -> P05
+/-
+Works with definitional equality: proves that 2 + 2 is 4 *by definition*.
+Why is this true? Because 4 = 0.succ.succ.succ.succ, 2 = 0.succ.succ
+and a + b.succ = (a + b).succ, so unraveling everything, both sides reduce to
+0.succ.succ.succ.succ, which is four!
+
+BUT: this only works because we are cleverly modelling Nat through DTT
+as an inductive type, not explicitly through Peano axioms! -> P05
+-/
 example : 2 + 2 = 4 := by
   rfl
 
@@ -73,8 +73,6 @@ example (α : Type) : α = α := by
 -- with Prop not arbitrary Type
 -- example (α : Type) : α ↔ α := by
 --   rfl
-
-
 /-
 ## Using hypotheses - the `assumption` tactic
 
@@ -99,7 +97,7 @@ example (n : ℕ) : (1 < n : Prop) = (n > 1 : Prop) := rfl
 --
 -- `(P : Prop)` is just a proposition, it can be true, false, unprovable
 -- a trivial lemma, a known theorem, an open conjecture, or complete garbage
--- 
+--
 -- `(p : P)` is an instantiation of `P` and therefore a proof to lean.
 -- Notably we are not working with booleans or even ⊤ here!
 example (P : Prop) (p : P) : P := by
@@ -107,7 +105,7 @@ example (P : Prop) (p : P) : P := by
 
 -- Given propositions `P` and `Q`, and proofs of both, prove `P`
 -- `(P Q : Prop)` is just a short grouping of `(P : Prop) (Q : Prop)`
--- linting again complains about `(q : Q)` being unused, but 
+-- linting again complains about `(q : Q)` being unused, but
 -- `(Q : Prop)` is fine because `(q : Q)` uses it (until you remove it)
 example (P Q : Prop) (p : P) (q : Q) : P := by
   assumption
@@ -117,14 +115,15 @@ example (P Q : Prop) (p : P) (q : Q) : P := by
 
 The `exact` tactic allows us to provide a term that precisely matches the goal type.
 Unlike assumption, which searches for matches, exact requires us to specify exactly
-which term we want to use, but otherwise has the same effect. The `rfl` tactic is essentially `exact rfl`. The tactic `exact?` looks for any term that can be
+which term we want to use, but otherwise has the same effect. The `rfl` tactic
+is essentially `exact rfl`. The tactic `exact?` looks for any term that can be
 used to close the goal. This tactic is used over 40,000 times in mathlib.
 -/
 
 -- Given a natural number `n` where `10 > n` and `1 < n`, prove that `1 < n`
 -- `_` makes the linter not complain, refers to intentionally unnamed variable
 -- same as in many other languages. Note that `\N` (or `\Nat`) produces `ℕ`
-example (n : ℕ) (_ : 10 > n) (h₂ : 1 < n) : 1 < n := by  
+example (n : ℕ) (_ : 10 > n) (h₂ : 1 < n) : 1 < n := by
   exact h₂ -- `exact` is leans `return` (in tactic mode, in term mode its implicit)
 
 -- Given proposition `P` and its proof, prove `P`
@@ -134,8 +133,6 @@ example (P : Prop) (p : P) : P := by
 -- Given propositions `P` and `Q`, and proofs of both, prove `P`
 example (P Q : Prop) (p : P) (_ : Q) : P := by
   exact p
-
-
 /-
 ## Exercise Block B01
 -/
@@ -168,12 +165,15 @@ example (P Q : Prop) (h : P → Q) : P → Q := by
 example (P Q : Prop) (h : P → Q) : P → Q := by
   exact h
 
--- this is called term mode (more on this later)
--- but note that this is no different than in Python implementing
--- ```
--- def foo(n: int) -> int:
---    return n
--- ```
+/-
+This is called term mode (more on this later)
+but note that this is no different than in Python implementing
+
+```
+def foo(n: int) -> int:
+   return n
+```
+-/
 example (P Q : Prop) (h : P → Q) : P → Q := h
 
 -- Given a function `h : P → Q` and a proof of `P`, we get a proof of `Q`
@@ -181,21 +181,23 @@ example (P Q : Prop) (h : P → Q) : P → Q := h
 example (P Q : Prop) (h : P → Q) (p : P) : Q := by
   exact h p
 
--- This in fact might be somewhat more intuitive in term mode
--- because it is similar to the following silly python code
---
--- ```
--- def foo(n: int) -> float:
---   return float(n)
---
--- def bar(x: float) -> str:
---   return str(x)
--- 
--- def foobar(n: int) -> str:
---   return bar(foo(n))
--- ```
--- 
--- Just note that function application in lean does not use brackets!
+/-
+This in fact might be somewhat more intuitive in term mode
+because it is similar to the following silly python code
+
+```
+def foo(n: int) -> float:
+  return float(n)
+
+def bar(x: float) -> str:
+  return str(x)
+
+def foobar(n: int) -> str:
+  return bar(foo(n))
+```
+
+Just note that function application in Lean does not use brackets!
+-/
 example (P Q : Prop) (h : P → Q) (p : P) : Q := h p
 
 -- We can compose `P → Q` and `Q → R` to get from `P` to `R`
@@ -221,8 +223,6 @@ example (P Q R : Prop) (p : P) (h₁ : P → Q) (h₂ : Q → R) : R := by
 -- but usage is now discouraged by the linter
 example (P Q R : Prop) (p : P) (h₁ : P → Q) (h₂ : Q → R) : R := by
   exact h₂ $ h₁ p
-
-
 /-
 ## The `intro` tactic
 
@@ -301,7 +301,7 @@ example (P Q R : Prop) (h₁ : P → Q → R) (h₂ : P → Q) : P → R := by
 example (P Q R : Prop) (h₁ : P → (Q → R)) (p : P) : Q → R := by
   exact h₁ p
 
--- Exercise 2.4 (Master students)
+-- Exercise 2.4 (Master)
 example (P Q R : Prop) (h₂ : Q → R) : P → (Q → R) := by
   intro
   assumption -- or `exact h₂`
@@ -309,29 +309,33 @@ example (P Q R : Prop) (h₂ : Q → R) : P → (Q → R) := by
 -- and the same in term mode
 example (P Q R : Prop) (h₂ : Q → R) : P → (Q → R) := fun _ => h₂
 
--- Think of it like the following python code:
---
--- ```
--- def foo(n: int, s: str) -> str:
---   return s
--- ```
---
--- The input `n: int` (`p : P`) is completely superfluous and unused!
--- The output `-> str` we could have of course constructed in many
--- different ways, but if the type `str` suddenly (i) could not distinguish
--- between different instances (`"foo"` is the same as `"bar"`) and
--- (ii) creating an instance was hard, then suddenly `return s` is 
--- sensible and the only logical thing to do. This is what happens in our proof.
+/-
+Think of it like the following python code:
 
--- The boundary between assumptions (left of `:`) and statement to be proven
--- (right of `:`) is blurry as shown by intro. In fact, we will see that
--- ultimately this is just "nice syntax" for mathematicians and underlying it
--- everything is one large "arrowed" type. Note that in this version we avoid
--- the `intro p` and the linter flags `p : P` as unused.
+```
+def foo(n: int, s: str) -> str:
+  return s
+```
+
+The input `n: int` (`p : P`) is completely superfluous and unused!
+The output `-> str` we could have of course constructed in many
+different ways, but if the type `str` suddenly (i) could not distinguish
+between different instances (`"foo"` is the same as `"bar"`) and
+(ii) creating an instance was hard, then suddenly `return s` is
+sensible and the only logical thing to do. This is what happens in our proof.
+-/
+
+/-
+The boundary between assumptions (left of `:`) and statement to be proven
+(right of `:`) is blurry as shown by intro. In fact, we will see that
+ultimately this is just "nice syntax" for mathematicians and underlying it
+everything is one large "arrowed" type. Note that in this version we avoid
+the `intro p` and the linter flags `p : P` as unused.
+-/
 example (P Q R : Prop) (h₂ : Q → R) (p : P) : (Q → R) := by
   exact h₂
 
--- Exercise 2.5 (Master students)
+-- Exercise 2.5 (Master)
 -- Note that `S → P → Q → R` is grouped as `S → (P → (Q → R))`
 example (P Q R S : Prop) : (S → P → Q → R) = (S → (P → (Q → R))) := rfl
 
@@ -356,8 +360,6 @@ example (A B : Prop) (hA : A) (h : A → B) : B := by
 example (A B : Prop) (hA : A) (h : A → B) : B := by
   revert hA
   assumption
-
-
 /-
 ## The `rw` tactic
 
@@ -543,7 +545,7 @@ example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p :
   h₃.mp <| h₂.mpr <| h₁.mp p
 
 /-
-# Term Mode and Direct Construction
+## Term Mode and Direct Construction
 
 Lean proofs (indicated by `:=`) can be written directly as terms,
 without tactics. This gives us two distinct styles of proving:
@@ -587,30 +589,30 @@ lemma id_proof (P Q : Prop) (p : P) (q : Q) : P := by
 -- you that the proof in term mode is just `fun P Q p q ↦ p`
 #print id_proof
 
--- But it also modified the statement from
--- `(P Q : Prop) (p : P) (q : Q) : P` to a flat
--- `∀ (P Q : Prop), P → Q → P` type. So this does not work:
---
--- ```
--- lemma id_proof_term (P Q : Prop) (p : P) (q : Q) : P :=
---   fun P Q p q ↦ p
--- ```
---
--- Lean actually takes all the arguments (things to the left of `:`) and
--- `reverts` them into the goal before formulating the term mode proof
+/-
+But it also modified the statement from
+`(P Q : Prop) (p : P) (q : Q) : P` to a flat
+`∀ (P Q : Prop), P → Q → P` type. So this does not work:
+
+```
+lemma id_proof_term (P Q : Prop) (p : P) (q : Q) : P :=
+  fun P Q p q ↦ p
+```
+
+Lean actually takes all the arguments (things to the left of `:`) and
+`reverts` them into the goal before formulating the term mode proof.
+-/
 
 -- But this does:
 lemma id_proof_term (P Q : Prop) (p : P) (q : Q) : P := p
 
 -- And this does:
-lemma id_proof_term' : ∀ (P Q : Prop), P → Q → P := 
+lemma id_proof_term' : ∀ (P Q : Prop), P → Q → P :=
   fun _ _ p _ => p -- or `fun P Q p q => p`
- 
+
 -- Same output (up to renamed variables) as `#print id_proof`
 #print id_proof_term
 #print id_proof_term'
-
-
 -- Let us look at the identity function in various styles.
 
 -- This is `id` in Lean (Init.Prelude)
@@ -619,34 +621,24 @@ lemma identity_tactic_intro (P : Prop) : P → P := by
   assumption -- or `exact p`
 
 #print identity_tactic_intro -- gives term `fun P p ↦ p`
-
-
 -- Second in tactic mode, but cheating with `id`
 lemma identity_tactic_id (P : Prop) : P → P := by
   exact id
 
 #print identity_tactic_id  -- gives term `fun P ↦ id`
-
-
 -- Third in term mode with a lambda function -- first syntax
 lemma identity_term_lambda (P : Prop) : P → P := fun p => p
 
 #print identity_term_lambda -- gives term `fun P p ↦ p`
-
-
 -- Third in term mode with a lambda function -- second syntax
 -- Note that the linter prefers `fun` over `λ`
 lemma identity_term_lambda' (P : Prop) : P → P := λ p ↦ p
 
 #print identity_term_lambda' -- gives term `fun P p ↦ p`
-
-
 -- Finally, this is actually just the identity function `id`
 lemma identity_term_id (P : Prop) : P → P := id
 
 #print identity_term_id  -- gives term `fun P ↦ id`
-
-
 -- `rfl` confirms these are all truly "the same" ...
 example : identity_term_id = identity_tactic_id := rfl
 example : identity_tactic_intro = identity_term_lambda := rfl

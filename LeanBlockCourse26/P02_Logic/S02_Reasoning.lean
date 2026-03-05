@@ -98,8 +98,6 @@ theorem example_backward (P Q R : Prop) (h₁ : P → Q) (h₂ : Q → R) (p : P
   exact p  -- We need and have a proof of P
 
 #print example_backward -- This just produces the forward term proof `h₂ (h₁ p)`
-
-
 /-
 Note that `apply`ing an implication to your goal is inherently destructive:
 it is very possible that you end up with a goal that is actually hard
@@ -296,8 +294,6 @@ you can replace them with `;`, e.g.:
 
 example (P Q R : Prop) (h₁ : P → Q) (h₂ : Q → R) (p : P) : R :=
   by apply h₂; exact h₁ p
-
-
 /-
 ## Exercise Block B02: Graph of Implications (Continued)
 -/

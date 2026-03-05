@@ -41,8 +41,6 @@ composition through `→`.
 
 def Not (a : Prop) : Prop := a → False
 -/
-
-
 -- This definition makes `rfl` work here ...
 example (P : Prop) : ¬P ↔ (P → False) := by
   rfl
@@ -60,7 +58,7 @@ example (P : Prop) : ¬P ↔ (P → False) := by
   constructor
   all_goals intro h; exact h
 
-example (P : Prop) : ¬P ↔ (P → False) := 
+example (P : Prop) : ¬P ↔ (P → False) :=
   ⟨id, id⟩
 
 -- If you have a negation in the assumption you can sometimes derive `False`
@@ -142,7 +140,8 @@ Normalizes negated expressions by pushing negation inward:
 - Simplifies nested negations
 -/
 
--- This is `Classical.not_not.mp` in Lean (Init.Classical), exported as `not_not.mp` by Mathlib.Logic.Basic
+-- This is `Classical.not_not.mp` in Lean (Init.Classical)
+-- Exported as `not_not.mp` by Mathlib.Logic.Basic
 theorem push_neg_example (P : Prop) : ¬¬P → P := by
   push_neg
   exact id
@@ -288,8 +287,6 @@ example (P : Prop) : P ∨ ¬P := Classical.em P
 #print axioms Classical.em -- ... but it uses `Classical.choice` ...
 
 #check Classical.choice -- ... which is closer to the axiom of choice (AoC)
-
-
 /-
 Looking into Lean, this is actually the first time we see something
 resembling a mathematical axiom:
@@ -374,8 +371,6 @@ theorem exercise_2_2_classical (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
   · exact p
 
 #print axioms exercise_2_2_classical' -- propext, Classical.choice, Quot.sound
-
-
 -- A neat notational trick: `‹P›` looks for any proof of `P` in your assumptions
 #golf theorem exercise_2_2_classical'' (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
   intro _ _
