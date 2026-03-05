@@ -11,17 +11,36 @@ nav_order: 9996
 
 ---
 
-In the exercise blocks we asked you to minimize the number of non-whitespace characters in your proof. The course repo contains a custom `#golf` command that measures this automatically.
+In the exercise blocks we asked you to minimize the number of non-whitespace characters in your proof. The [`ProofGolf`](https://github.com/FordUniver/ProofGolf) package provides a `#golf` command that measures this automatically.
 
-## Using `#golf` in your own project
+## Adding `ProofGolf` to your project
 
-To use `#golf` outside the course repo, copy [`LeanBlockCourse26/CodeGolf.lean`](https://github.com/FordUniver/LeanBlockCourse26/blob/main/LeanBlockCourse26/CodeGolf.lean) into the corresponding location in your project (i.e., `YourProject/CodeGolf.lean`) and add `import YourProject.CodeGolf` to any file where you want to use it. Then wrap your proof with `#golf`:
+Add the dependency to your `lakefile.toml`:
+
+```toml
+[[require]]
+name = "ProofGolf"
+scope = "FordUniver"
+```
+
+Then run `lake update ProofGolf` and add `import ProofGolf` to any file where you want to use it.
+
+## Usage
+
+Wrap any declaration with `#golf`:
 
 ```lean
 #golf example (P Q : Prop) : P ∧ Q → Q ∧ P := by
   intro ⟨p, q⟩
   exact ⟨q, p⟩
--- Golf: 20 chars
+-- Golf: 20 chars | term: 25 nodes | pp: 30 chars | axioms: none
+```
+
+For named declarations, `#golf` also reports the elaborated proof term size, pretty-printed length, and which foundational axioms the proof depends on:
+
+```lean
+#golf theorem em (P : Prop) : P ∨ ¬P := by exact Classical.em P
+-- Golf: 18 chars | term: 5 nodes | pp: 23 chars | axioms: 3 (Classical.choice, propext, Quot.sound)
 ```
 
 ## Scoring rules
@@ -30,4 +49,4 @@ Whitespace is free: indentation and newlines do not count. The tactic separator 
 
 ## How it works
 
-`#golf` is a custom Lean 4 elaboration command. It wraps any declaration (`example`, `theorem`, `def`), elaborates it normally, then extracts the proof body from the syntax tree using source positions. This avoids the need to manually paste your proof into a string.
+`#golf` is a custom Lean 4 elaboration command. It wraps any declaration (`example`, `theorem`, `def`), elaborates it normally, then extracts the proof body from the syntax tree using source positions. For term-level metrics, it looks up the elaborated proof term in the environment (for `example` declarations, it re-elaborates a synthetic `def` to capture the term). Axiom dependencies are collected transitively using Lean's built-in `collectAxioms`.
