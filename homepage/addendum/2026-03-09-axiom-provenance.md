@@ -1,5 +1,5 @@
 ---
-title: "Axiom provenance"
+title: "Prove axiom-free proofs"
 parent: Addendum
 nav_order: 0
 ---
